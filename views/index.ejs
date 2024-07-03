@@ -25,9 +25,15 @@
 
   </form>
 
+  <!-- ADD BUTTON -->
   <form action="/add" method="post">
     <input type="text" name="country" autofocus placeholder="<%= locals.error ? error :  'Enter country name'%>">
     <button type="submit" style="background-color: <%= color %>;">Add</button>
+  </form>
+
+  <!-- DELETE USER BUTTON -->
+  <form action="/deleteUser" method="get">
+    <button type="submit" style="background-color: <%= color %>;">Delete User</button>
   </form>
 
   <section class="ag-canvas">
