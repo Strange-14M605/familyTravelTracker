@@ -8,14 +8,6 @@ dotenv.config();
 const app = express();
 const port = 3000;
 
-// const db = new pg.Client({
-//   user: "postgres",
-//   host: "localhost",
-//   database: "world",
-//   password: "postgres2020",
-//   port: 5432,
-// });
-
 const db = new pg.Client({
   connectionString: process.env.DATABASE_URL,
 });
@@ -30,9 +22,14 @@ db.connect().then(() => {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-let currentUserId = 12;
+// let currentUserId = 12;
 let users = [];
-var error, countries;
+var error, countries, currentUserId;
+
+async function getCurrentUserId(){
+  const result = await db.query("SELECT id FROM users LIMIT 1");
+  return result.rows[0].id;
+}
 
 async function checkVisisted(currentUserId) {
   const result = await db.query(
@@ -54,14 +51,17 @@ app.get("/", async (req, res) => {
   } catch (err) {
     console.log(err.message);
   }
-
+  if(!currentUserId){           //init case
+    currentUserId=await getCurrentUserId();
+  }
   countries = await checkVisisted(currentUserId);
+  let currentColor= await db.query("SELECT color FROM users WHERE id=$1", [currentUserId]); //gets map color
   res.render("index.ejs", {
     error: error,
     countries: countries,
     total: countries.length,
     users: users,
-    color: "teal",
+    color: currentColor.rows[0].color, //passes relevent color!
   });
 });
 
